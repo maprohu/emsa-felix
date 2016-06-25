@@ -95,30 +95,33 @@
     </build>
 
     <dependencies>
-        <!--<dependency>-->
-            <!--<groupId>org.apache.felix</groupId>-->
-            <!--<artifactId>org.apache.felix.gogo.shell</artifactId>-->
-            <!--<version>${gogo.shell.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.felix</groupId>-->
-            <!--<artifactId>org.apache.felix.gogo.runtime</artifactId>-->
-            <!--<version>${gogo.runtime.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.felix</groupId>-->
-            <!--<artifactId>org.apache.felix.gogo.command</artifactId>-->
-            <!--<version>${gogo.command.version}</version>-->
-        <!--</dependency>-->
-        <!--<dependency>-->
-            <!--<groupId>org.apache.felix</groupId>-->
-            <!--<artifactId>org.apache.felix.bundlerepository</artifactId>-->
-            <!--<version>${obr.version}</version>-->
-        <!--</dependency>-->
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.shell</artifactId>
+            <version>${gogo.shell.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.runtime</artifactId>
+            <version>${gogo.runtime.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.gogo.command</artifactId>
+            <version>${gogo.command.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.bundlerepository</artifactId>
+            <version>${obr.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>emsa</groupId>
             <artifactId>felix-bundle</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
 
 

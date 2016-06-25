@@ -2,6 +2,7 @@ package emsa.felix.embedded
 
 import java.io.File
 
+import emsa.felix.api.FelixApi
 import org.apache.felix.main.AutoProcessor
 import org.apache.felix.service.command.CommandProcessor
 import org.osgi.framework.Constants
@@ -53,6 +54,8 @@ object FelixEmbedded {
           |""".stripMargin.replaceAll("\\s", ""),
       AutoProcessor.AUTO_DEPLOY_DIR_PROPERTY -> (data / "bundle").getAbsolutePath,
       AutoProcessor.AUTO_DEPLOY_ACTION_PROPERTY -> "install,start",
+      "obr.repository.url" -> (data / "repo" / "repository.xml").toURI.toString,
+      FelixApi.DataDir -> data.absolutePath,
       "gosh.args" -> ""
 //      "gosh.args" -> "--xtrace --command telnetd start"
 //    "gosh.args" -> "--nointeractive --xtrace --command telnetd start"

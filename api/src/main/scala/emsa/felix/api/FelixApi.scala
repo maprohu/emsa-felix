@@ -10,6 +10,8 @@ import scala.concurrent.Future
   */
 object FelixApi {
 
+  val DataDir = "emsa.felix.data"
+
   val defaultHandler = new FelixApiHandler {
     override def process(req: HttpServletRequest, res: HttpServletResponse): Unit = {
       res.getWriter.println("no handler")
