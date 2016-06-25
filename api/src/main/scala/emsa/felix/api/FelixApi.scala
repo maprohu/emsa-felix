@@ -1,7 +1,7 @@
 package emsa.felix.api
 
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
-import javax.websocket.{CloseReason, Session}
+import javax.websocket.{CloseReason, EndpointConfig, Session}
 
 import scala.concurrent.Future
 
@@ -15,9 +15,10 @@ object FelixApi {
       res.getWriter.println("no handler")
     }
 
-    override def socket(session: Session, endpoint: String, closing: Future[CloseReason]): Unit = {
-      session.close()
-    }
+    override def socketOpen(session: Session, endpointConfig: EndpointConfig, endpoint: String): Unit = ()
+
+    override def socketClose(session: Session, closeReason: CloseReason): Unit = ()
+
   }
 
   var handlers = List[FelixApiHandler](defaultHandler)
@@ -28,9 +29,6 @@ object FelixApi {
     activeHandler.process(req, res)
   }
 
-  def dispatch(session: Session, endpoint: String, closing: Future[CloseReason]): Unit = {
-    activeHandler.socket(session, endpoint, closing)
-  }
 
   def register(handler: FelixApiHandler) : Unit = this.synchronized {
     handlers = handler +: handlers
@@ -46,6 +44,18 @@ trait FelixApiHandler {
 
   def process(request: HttpServletRequest, response: HttpServletResponse)
 
-  def socket(session: Session, endpoint: String, closing: Future[CloseReason])
+  def socketOpen(session: Session, endpointConfig: EndpointConfig, endpoint: String)
+  def socketClose(session: Session, closeReason: CloseReason)
+
+
+}
+
+trait SessionClose {
+  def onClose(reason: CloseReason)
+}
+
+trait SessionEvents {
+
+  def registerClose(onClose: SessionClose)
 
 }

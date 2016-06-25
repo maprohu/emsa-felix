@@ -4,7 +4,8 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.ws.{BinaryMessage, WebSocketRequest}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Keep, StreamConverters}
+import akka.stream.scaladsl.{Keep, Source, StreamConverters}
+import akka.util.ByteString
 import com.typesafe.config.ConfigFactory
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -26,13 +27,14 @@ object RunClient {
     implicit val actorMaterializer = ActorMaterializer()
     import actorSystem.dispatcher
 
+
     val wsFlow =
-      Http().webSocketClientFlow(WebSocketRequest("ws://localhost:9977/starfelix/socket"))
+      Http().webSocketClientFlow(WebSocketRequest("ws://localhost:9977/starfelix/websocket/console"))
 //    Http().webSocketClientFlow(WebSocketRequest(s"ws://localhost:${RunEchoServer.port}/${RunEchoServer.wsPath}"))
 
 
     val mat1 =
-      StreamConverters.fromInputStream(() => System.in, 1)
+      StreamConverters.fromInputStream(() => System.in)
         .map(bs => BinaryMessage(bs))
         .viaMat(wsFlow)(Keep.right)
         .collect({case bm : BinaryMessage => bm.dataStream})

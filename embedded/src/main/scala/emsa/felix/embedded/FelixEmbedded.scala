@@ -48,7 +48,8 @@ object FelixEmbedded {
         """
           |emsa.felix.api,
           |javax.servlet;version="3.0.1",
-          |javax.servlet.http;version="3.0.1"
+          |javax.servlet.http;version="3.0.1",
+          |javax.websocket;version="1.1.0"
           |""".stripMargin.replaceAll("\\s", ""),
       AutoProcessor.AUTO_DEPLOY_DIR_PROPERTY -> (data / "bundle").getAbsolutePath,
       AutoProcessor.AUTO_DEPLOY_ACTION_PROPERTY -> "install,start",

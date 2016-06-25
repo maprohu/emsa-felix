@@ -65,7 +65,12 @@
         <dependency>
             <groupId>com.typesafe.akka</groupId>
             <artifactId>akka-http-experimental_2.11</artifactId>
-            <version>2.4.7</version>
+            <version>${akka.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-osgi_2.11</artifactId>
+            <version>${akka.version}</version>
         </dependency>
         <dependency>
             <groupId>org.scala-lang</groupId>
