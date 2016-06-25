@@ -1,5 +1,7 @@
 package emsa.felix.client
 
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
 import emsa.felix.deploy.{Bundle, FelixDeploy}
 
 /**
@@ -12,6 +14,9 @@ object RunMaven {
 //      FelixDeploy.pom(<build></build>),
 //      "install"
 //    )(_ => ())
+    implicit val actorSystem = ActorSystem()
+    implicit val materializer = ActorMaterializer()
+    import actorSystem.dispatcher
 
     FelixDeploy.perform(
       Bundle(
@@ -19,8 +24,12 @@ object RunMaven {
         "felix-bundle",
         "1.0.0.dev"
       ),
+      "http://localhost:9977/starfelix/repo",
       "file:/wl_domains/star/star-apps/data/starfelix/repo"
-    )
+    ).onComplete{ res =>
+      println(res)
+      actorSystem.terminate()
+    }
   }
 
 }

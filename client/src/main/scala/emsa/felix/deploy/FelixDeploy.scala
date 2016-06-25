@@ -1,12 +1,19 @@
 package emsa.felix.deploy
 
 import java.io.File
+import java.nio.file.{Path, Paths}
 
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model._
+import akka.stream.Materializer
+import akka.stream.scaladsl.{FileIO, Sink, Source, StreamConverters}
 import org.apache.maven.shared.invoker.{DefaultInvocationRequest, DefaultInvoker}
 import sbt.io.IO
 import sbt.io.Path._
 
 import scala.collection.JavaConversions._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.{Node, NodeSeq, XML}
 
 /**
@@ -14,7 +21,11 @@ import scala.xml.{Node, NodeSeq, XML}
   */
 object FelixDeploy {
 
-  def perform(bundle: Bundle, target: String) = {
+  def perform(bundle: Bundle, target: Uri, obr: Uri)(implicit
+    actorSystem: ActorSystem,
+    materializer: Materializer,
+    executionContext: ExecutionContext
+  ) = {
     runMaven(
       pom(
         Poms.singleDep(bundle),
@@ -22,75 +33,131 @@ object FelixDeploy {
       ),
       "dependency:list"
     ) { dir =>
-      val deps = dir / "target" / "deps"
-      deps.mkdirs()
+//      val deps = dir / "target" / "deps"
+//      deps.mkdirs()
 
-      val execs =
-        IO
+      val repoFile = dir / "target" / "repo"
+      val repoUrl = repoFile.toURI.toString
+      val depsString = IO
           .readLines(
             dir / "target" / "deps.txt"
           )
-          .map( _.trim.split(':'))
-          .collect({
-            case Array(group, artifact, _, version, path) =>
-              val bnd = Bundle(group, artifact, version)
-              val source = new File(path)
-              val copied =
-                deps / source.getName
 
-              IO.copyFile(source, copied)
+      val repoxmlfile = (repoFile / "repository.xml")
 
-              <execution>
-                <id>{path}</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>deploy-file</goal>
-                </goals>
-                <configuration>
-                  <url>{target}</url>
-                  <file>{copied.getAbsolutePath}</file>
-                  {bnd.toXml}
-                  <packaging>jar</packaging>
-                  <bundleUrl>file:/boo</bundleUrl>
-                </configuration>
-              </execution>
-          })
+      val repoxmluri = target.withPath(target.path / "repository.xml")
+      for {
+        repoxml <- Http().singleRequest(
+          HttpRequest(
+            uri = repoxmluri
+          )
+        )
+        _ <- if (repoxml.status.isSuccess()) {
+          repoxml.entity.dataBytes.runWith(
+            FileIO.toPath(repoxmlfile.toPath)
+          )
+        } else {
+          Future()
+        }
+        done <- {
 
-      runMaven(
-        pom(
-          <build>
-            <plugins>
-              <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
-                <configuration>
-                  <uniqueVersion>false</uniqueVersion>
-                </configuration>
-                <executions>
-                  {execs}
-                </executions>
-              </plugin>
-              <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                  {execs}
-                </executions>
-              </plugin>
-            </plugins>
-          </build>
-        ),
-        "package"
-      )(_ => ())
+          val (ups, execs) = depsString
+            .map(_.trim.split(':'))
+            .collect({
+              case Array(group, artifact, _, version, path) =>
+                val bnd = Bundle(group, artifact, version)
+
+                val uploadname =
+                  s"${group}-${artifact}-${version}.jar"
+
+                val obruri = obr.withPath(
+                  obr.path / uploadname
+                )
+
+                val uploadRequest =
+                  HttpRequest(
+                    method = HttpMethods.PUT,
+                    uri = target.withPath(target.path / uploadname),
+                    entity = HttpEntity.fromPath(ContentTypes.`application/octet-stream`, new File(path).toPath)
+                  )
+
+                val pomx =
+                  <execution>
+                    <id>
+                      {path}
+                    </id>
+                    <phase>package</phase>
+                    <goals>
+                      <goal>deploy-file</goal>
+                    </goals>
+                    <configuration>
+                      <url>
+                        {repoUrl}
+                      </url>
+                      <file>
+                        {path}
+                      </file>{bnd.toXml}<packaging>bundle</packaging>
+                      <bundleUrl>{obruri.toString()}</bundleUrl>
+                    </configuration>
+                  </execution>
+
+                (uploadRequest, pomx)
+            })
+            .unzip
+
+          runMaven(
+            pom(
+              <build>
+                <plugins>
+                  <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>3.0.1</version>
+                    <executions>
+                      {execs}
+                    </executions>
+                  </plugin>
+                </plugins>
+              </build>
+            ),
+            "package"
+          ) { _ =>
+
+            val repoupxml = IO.read(repoxmlfile)
+
+            Source.single(
+              HttpRequest(
+                method = HttpMethods.PUT,
+                uri = repoxmluri,
+                entity = HttpEntity(repoupxml)
+              )
+            )
+              .concat(
+                Source(ups)
+              )
+              .mapAsync(1)({ up =>
+                Http().singleRequest(
+                  up
+                )
+              })
+              .runWith(Sink.foreach( out =>
+                println(out)
+              ))
+
+
+          }
+
+        }
+      } yield {
+        done
+      }
 
 
     }
 
   }
 
-  def runMaven(pomFileString: Node, goal : String)( andThen : File => Unit ) : Unit = {
+  def runMaven[T](pomFileString: Node, goal : String)( andThen : File => T ) = {
     IO.withTemporaryDirectory { dir =>
       val pomFile = dir / "pom.xml"
 
@@ -105,6 +172,8 @@ object FelixDeploy {
 
       if (result.getExitCode == 0) {
         andThen(dir)
+      } else {
+        throw new RuntimeException()
       }
     }
   }
