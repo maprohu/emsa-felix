@@ -20,6 +20,7 @@
         <module>start</module>
         <module>util</module>
         <module>route-api</module>
+        <module>logging</module>
     </modules>
 
     <properties>
@@ -83,6 +84,16 @@
                 <groupId>emsa</groupId>
                 <artifactId>felix-bundle</artifactId>
                 <version>1.0.0.dev</version>
+            </dependency>
+            <dependency>
+                <groupId>emsa</groupId>
+                <artifactId>felix-logging</artifactId>
+                <version>1.0.0.dev</version>
+            </dependency>
+            <dependency>
+                <groupId>emsa</groupId>
+                <artifactId>felix-api</artifactId>
+                <version>1.0-SNAPSHOT</version>
             </dependency>
 
         </dependencies>

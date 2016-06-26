@@ -19,7 +19,9 @@ class FelixServlet extends HttpServlet {
   var fw : Framework = null
 
   override def init(): Unit = {
-    fw = FelixEmbedded.initStar("starfelix")
+    val ctx = FelixEmbedded.contextStar("starfelix").copy(debug = true)
+
+    fw = FelixEmbedded.init(ctx)
   }
 
   override def destroy(): Unit = {

@@ -123,6 +123,28 @@
             <groupId>emsa</groupId>
             <artifactId>felix-bundle</artifactId>
         </dependency>
+        <dependency>
+            <groupId>emsa</groupId>
+            <artifactId>felix-logging</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>osgi-over-slf4j</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.21</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.7</version>
+        </dependency>
+
+
 
 
     </dependencies>

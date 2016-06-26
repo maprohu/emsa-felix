@@ -1,8 +1,9 @@
 package emsa.felix.embedded
 
 import java.io.File
+import java.nio.file.Path
 
-import emsa.felix.api.FelixApi
+import emsa.felix.api.{Context, FelixApi}
 import org.apache.felix.main.AutoProcessor
 import org.apache.felix.service.command.CommandProcessor
 import org.osgi.framework.Constants
@@ -19,19 +20,41 @@ import scala.collection.JavaConversions._
   */
 object FelixEmbedded {
 
-  def initImdate(app: String) =
-    initEmsa("imdate", "imdate-ext", app)
+  case class Ctx(
+    name: String,
+    data: Path,
+    log: Path,
+    debug: Boolean
+  ) extends Context
 
-  def initStar(app: String) =
-    initEmsa("star", "star-apps", app)
+  def contextImdate(app: String) =
+    contextEmsa("imdate", "imdate-ext", app)
 
-  def initEmsa(domain: String, sub: String, app: String) =
-    init(new File("/wl_domains") / domain / sub, app)
+  def contextStar(app: String) =
+    contextEmsa("star", "star-apps", app)
+
+  def contextEmsa(domain: String, sub: String, app: String) =
+    context(new File("/wl_domains") / domain / sub, app)
 
 
-  def init(dir: File, app: String) = {
+  def context(dir: File, app: String) = {
+
 
     val data = dir / "data" / app
+    val log = dir / "logs"
+
+    Ctx(
+      name = app,
+      data = data.toPath,
+      log = log.toPath,
+      debug = false
+    )
+  }
+
+  def init(ctx: Context) = {
+    FelixApi.context = ctx
+
+    val data = ctx.data.toFile
 
     if (!data.exists()) {
       data.mkdirs()
@@ -55,7 +78,7 @@ object FelixEmbedded {
       AutoProcessor.AUTO_DEPLOY_DIR_PROPERTY -> (data / "bundle").getAbsolutePath,
       AutoProcessor.AUTO_DEPLOY_ACTION_PROPERTY -> "install,start",
       "obr.repository.url" -> (data / "repo" / "repository.xml").toURI.toString,
-      FelixApi.DataDir -> data.absolutePath,
+//      FelixApi.DataDir -> data.absolutePath,
       "gosh.args" -> ""
 //      "gosh.args" -> "--xtrace --command telnetd start"
 //    "gosh.args" -> "--nointeractive --xtrace --command telnetd start"

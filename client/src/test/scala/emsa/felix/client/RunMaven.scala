@@ -1,6 +1,7 @@
 package emsa.felix.client
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import emsa.felix.deploy.{Bundle, FelixDeploy}
 
@@ -28,7 +29,9 @@ object RunMaven {
       "file:/wl_domains/star/star-apps/data/starfelix/repo"
     ).onComplete{ res =>
       println(res)
-      actorSystem.terminate()
+      Http().shutdownAllConnectionPools().onComplete { _ =>
+        actorSystem.terminate()
+      }
     }
   }
 

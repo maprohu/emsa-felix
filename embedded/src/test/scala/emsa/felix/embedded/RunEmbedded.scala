@@ -21,7 +21,7 @@ object RunEmbedded {
 
     IO.delete(new File("/wl_domains/star/star-apps/data/starfelix"))
 
-    val fw = FelixEmbedded.initStar("starfelix")
+    val fw = FelixEmbedded.contextStar("starfelix")
 
 
 //    implicit val actorSystem = ActorSystem("test", ConfigFactory.parseString(

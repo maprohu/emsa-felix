@@ -66,7 +66,7 @@ object Console {
           ()
         })
 
-    val dataDir = new File(ctx.getProperty(FelixApi.DataDir))
+    val dataDir = FelixApi.context.data.toFile
     val m2Dir = new File(dataDir, "repo")
     m2Dir.mkdirs()
 

@@ -1,16 +1,24 @@
 package emsa.felix.api
 
+import java.nio.file.Path
 import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 import javax.websocket.{CloseReason, EndpointConfig, Session}
-
-import scala.concurrent.Future
 
 /**
   * Created by pappmar on 23/06/2016.
   */
+trait Context {
+  def name: String
+  def data: Path
+  def log: Path
+  def debug: Boolean
+}
+
 object FelixApi {
 
-  val DataDir = "emsa.felix.data"
+  var context : Context = null
+
+//  val DataDir = "emsa.felix.data"
 
   val defaultHandler = new FelixApiHandler {
     override def process(req: HttpServletRequest, res: HttpServletResponse): Unit = {
