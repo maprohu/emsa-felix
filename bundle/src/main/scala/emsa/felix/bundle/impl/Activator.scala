@@ -15,7 +15,7 @@ import akka.http.scaladsl.model.ws.{BinaryMessage, Message, TextMessage}
 import akka.http.scaladsl.model.{ContentTypes, HttpProtocols, HttpResponse, _}
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import akka.stream.{ActorMaterializer, OverflowStrategy}
+import akka.stream.{ActorMaterializer, IOResult, OverflowStrategy}
 import akka.stream.scaladsl.{Keep, Sink, Source, SourceQueueWithComplete, StreamConverters}
 import akka.util.{ByteString, Unsafe}
 import com.typesafe.config.ConfigFactory
@@ -28,6 +28,7 @@ import org.osgi.framework.{BundleActivator, BundleContext}
 import scala.collection.JavaConversions
 import scala.concurrent.{Await, Future, Promise}
 import scala.concurrent.duration._
+import scala.util.Success
 
 /**
   * Created by pappmar on 22/06/2016.
@@ -91,41 +92,51 @@ class DefaultFelixApiHandler(implicit actorSystem: ActorSystem) extends FelixApi
   override def process(req: HttpServletRequest, res: HttpServletResponse): Unit = {
     import JavaConversions._
 
+    val aCtx = req.startAsync(req, res)
+
+
     val httpRequest: HttpRequest = HttpRequest(
       method = HttpMethods.getForKey(req.getMethod).get,
       uri = Uri(req.getRequestURI).copy(rawQueryString = Option(req.getQueryString)),
       headers = req.getHeaderNames.toIterable.map({ headerName =>
         HttpHeader.parse(headerName, req.getHeader(headerName)).asInstanceOf[Ok].header
       })(collection.breakOut),
-      entity = HttpEntity(Option(req.getContentType).map(ct => ContentType.parse(ct).right.get).getOrElse(ContentTypes.`application/octet-stream`), StreamConverters.fromInputStream(() => req.getInputStream)),
+      entity = HttpEntity(
+        contentType =
+          Option(req.getContentType)
+            .map(ct => ContentType.parse(ct).right.get)
+            .getOrElse(ContentTypes.`application/octet-stream`),
+        data =
+          StreamConverters
+            .fromInputStream(() => req.getInputStream)
+      ),
       protocol = HttpProtocols.getForKey(req.getProtocol).get
     )
 
-    val httpResponse: HttpResponse = Await.result(routeHandler(httpRequest), Duration.Inf)
+    for {
+      httpResponse <- routeHandler(httpRequest)
+      _ <- {
+        httpResponse.headers.foreach { h =>
+          res.setHeader(h.name(), h.value())
+        }
+        res.setStatus(httpResponse.status.intValue())
+        res.setContentType(httpResponse.entity.contentType.toString())
+        httpResponse.entity.contentLengthOption.foreach { cl =>
+          res.setContentLength(cl.toInt)
+        }
 
-    httpResponse.headers.foreach { h =>
-      res.setHeader(h.name(), h.value())
-    }
-    res.setStatus(httpResponse.status.intValue())
-    res.setContentType(httpResponse.entity.contentType.toString())
-    httpResponse.entity.contentLengthOption.foreach { cl =>
-      res.setContentLength(cl.toInt)
-    }
+        httpResponse.entity.dataBytes
+          .toMat(
+            StreamConverters.fromOutputStream(
+              () => res.getOutputStream
+            )
+          )(Keep.right)
+          .run()
 
-    val os = res.getOutputStream
-    val out = Channels.newChannel(os)
-
-    val writer = httpResponse.entity.dataBytes.runForeach { bytes =>
-      bytes.asByteBuffers.foreach { bb =>
-        out.write(bb)
-        os.flush()
       }
+    } yield {
+      aCtx.complete()
     }
-
-    Await.result(writer, Duration.Inf)
-
-    out.close()
-    os.close()
 
   }
 

@@ -13,7 +13,12 @@ import scala.concurrent.duration._
 /**
   * Created by pappmar on 23/06/2016.
   */
-@WebServlet(name="felix", urlPatterns = Array("/"), loadOnStartup = 1 )
+@WebServlet(
+  name="felix",
+  urlPatterns = Array("/"),
+  loadOnStartup = 1,
+  asyncSupported = true
+)
 class FelixServlet extends HttpServlet {
 
   var fw : Framework = null
