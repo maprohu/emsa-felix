@@ -9,8 +9,7 @@
         <artifactId>felix</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>felix-util</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>felix-logging</artifactId>
     <packaging>bundle</packaging>
     <version>1.0.0.dev</version>
 
@@ -23,6 +22,7 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
+                        <Fragment-Host>ch.qos.logback.classic</Fragment-Host>
                     </instructions>
                 </configuration>
             </plugin>
@@ -31,23 +31,28 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-http-experimental_2.11</artifactId>
-            <version>${akka.version}</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.1.7</version>
         </dependency>
         <dependency>
-            <groupId>osgi-repacks</groupId>
-            <artifactId>scalarx</artifactId>
-            <version>0.3.1</version>
+            <groupId>emsa</groupId>
+            <artifactId>felix-api</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-compiler</artifactId>
-            <version>2.11.8</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>javax.websocket</groupId>
+            <artifactId>javax.websocket-api</artifactId>
+            <version>1.1</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
-
 
 
 </project>

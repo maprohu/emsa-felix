@@ -13,6 +13,7 @@ object RunWar {
   def main(args: Array[String]) {
 
     IO.delete(new File("/wl_domains/star/star-apps/data/starfelix"))
+    System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "debug")
 
     MainTomcat.main(args)
 

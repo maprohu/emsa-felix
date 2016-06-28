@@ -20,87 +20,6 @@
     </properties>
 
     <build>
-        <!--<plugins>-->
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-dependency-plugin</artifactId>-->
-                <!--<version>2.10</version>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>copy</id>-->
-                        <!--<phase>generate-resources</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>copy</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<artifactItems>-->
-                                <!--<artifactItem>-->
-                                    <!--<groupId>org.apache.felix</groupId>-->
-                                    <!--<artifactId>org.apache.felix.gogo.runtime</artifactId>-->
-                                    <!--<version>${gogo.runtime.version}</version>-->
-                                <!--</artifactItem>-->
-                                <!--<artifactItem>-->
-                                    <!--<groupId>org.apache.felix</groupId>-->
-                                    <!--<artifactId>org.apache.felix.gogo.shell</artifactId>-->
-                                    <!--<version>${gogo.shell.version}</version>-->
-                                <!--</artifactItem>-->
-                                <!--<artifactItem>-->
-                                    <!--<groupId>org.apache.felix</groupId>-->
-                                    <!--<artifactId>org.apache.felix.gogo.command</artifactId>-->
-                                    <!--<version>${gogo.command.version}</version>-->
-                                <!--</artifactItem>-->
-                                <!--<artifactItem>-->
-                                    <!--<groupId>org.apache.felix</groupId>-->
-                                    <!--<artifactId>org.apache.felix.bundlerepository</artifactId>-->
-                                    <!--<version>${obr.version}</version>-->
-                                <!--</artifactItem>-->
-                                <!--&lt;!&ndash;<artifactItem>&ndash;&gt;-->
-                                <!--&lt;!&ndash;<groupId>emsa</groupId>&ndash;&gt;-->
-                                <!--&lt;!&ndash;<artifactId>felix-bundle</artifactId>&ndash;&gt;-->
-                                <!--&lt;!&ndash;<version>${project.version}</version>&ndash;&gt;-->
-                                <!--&lt;!&ndash;</artifactItem>&ndash;&gt;-->
-                                <!--&lt;!&ndash;<artifactItem>&ndash;&gt;-->
-                                <!--&lt;!&ndash;<groupId>org.scala-lang</groupId>&ndash;&gt;-->
-                                <!--&lt;!&ndash;<artifactId>scala-library</artifactId>&ndash;&gt;-->
-                                <!--&lt;!&ndash;<version>2.11.8</version>&ndash;&gt;-->
-                                <!--&lt;!&ndash;</artifactItem>&ndash;&gt;-->
-                            <!--</artifactItems>-->
-                            <!--<outputDirectory>${project.basedir}/target/bundle</outputDirectory>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                    <!--<execution>-->
-                        <!--<id>copy-deps</id>-->
-                        <!--<phase>generate-resources</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>copy-dependencies</goal>-->
-                        <!--</goals>-->
-                        <!--<configuration>-->
-                            <!--<outputDirectory>${project.basedir}/target/bundle</outputDirectory>-->
-                        <!--</configuration>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
-            <!--<plugin>-->
-                <!--<artifactId>maven-assembly-plugin</artifactId>-->
-                <!--<configuration>-->
-                    <!--<descriptors>-->
-                        <!--<descriptor>src/main/assembly/zip.xml</descriptor>-->
-                    <!--</descriptors>-->
-                    <!--<outputDirectory>${project.build.outputDirectory}/emsa/felix/embedded</outputDirectory>-->
-                    <!--<finalName>resources</finalName>-->
-                    <!--<appendAssemblyId>false</appendAssemblyId>-->
-                <!--</configuration>-->
-                <!--<executions>-->
-                    <!--<execution>-->
-                        <!--<id>make-assembly</id>-->
-                        <!--<phase>generate-resources</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>single</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
-                <!--</executions>-->
-            <!--</plugin>-->
-        <!--</plugins>-->
     </build>
 
     <dependencies>
@@ -153,7 +72,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
             <version>3.0.1</version>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

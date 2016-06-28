@@ -20,6 +20,8 @@ object MainTomcat {
 
     val ctx = tomcat.addWebapp("/starfelix", new File("war/src/main/webapp").getAbsolutePath).asInstanceOf[StandardContext]
 
+    ctx.setProcessTlds(false)
+
     val additionalWebInfClasses = new File("war/target/classes")
     val resources = new VirtualDirContext()
     resources.setExtraResourcePaths("/WEB-INF/classes=" + additionalWebInfClasses)

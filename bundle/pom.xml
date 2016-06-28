@@ -11,6 +11,7 @@
     </parent>
     <artifactId>felix-bundle</artifactId>
     <packaging>bundle</packaging>
+    <version>1.0.0.dev</version>
 
     <properties>
         <gogo.runtime.version>0.16.2</gogo.runtime.version>
@@ -43,12 +44,10 @@
         <dependency>
             <groupId>emsa</groupId>
             <artifactId>felix-util</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>emsa</groupId>
             <artifactId>felix-route-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -67,11 +66,11 @@
             <artifactId>akka-http-experimental_2.11</artifactId>
             <version>${akka.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.typesafe.akka</groupId>
-            <artifactId>akka-osgi_2.11</artifactId>
-            <version>${akka.version}</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.typesafe.akka</groupId>-->
+            <!--<artifactId>akka-osgi_2.11</artifactId>-->
+            <!--<version>${akka.version}</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-reflect</artifactId>
