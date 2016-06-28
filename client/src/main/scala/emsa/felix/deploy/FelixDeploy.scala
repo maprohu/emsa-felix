@@ -62,7 +62,15 @@ object FelixDeploy {
         done <- {
 
           val (ups, execs) = depsString
-            .map(_.trim.split(':'))
+            .map({ line =>
+              val f = line.trim.split(':')
+              if (f.length == 6) {
+                // windows has : in path
+                f.take(4) ++ Array(s"${f(4)}:${f(5)}")
+              } else {
+                f
+              }
+            })
             .collect({
               case Array(group, artifact, _, version, path) =>
                 val bnd = Bundle(group, artifact, version)
