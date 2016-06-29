@@ -67,6 +67,9 @@ object RunClient6 {
           .flatMapConcat(_.entity.dataBytes)
           .to(StreamConverters.fromOutputStream(() => System.out))
         )
+        .takeWhile({ resp =>
+          resp.status.isSuccess()
+        })
         .map(_ => poll)
         .prepend(Source.single(poll))
 
