@@ -15,66 +15,12 @@ import scala.concurrent.{ExecutionContext, Future}
   */
 object RunClient6 {
 
-  def debug[T](future : Future[T])(implicit executionContext: ExecutionContext) =
-    future.onComplete(println)
 
   def main(args: Array[String]) {
 
-    val id = args match {
-      case Array(id) => id
-      case _ => "1"
-    }
-
-    implicit val actorSystem = ActorSystem("test", ConfigFactory.parseString(
-      """
-        |akka.loglevel = "DEBUG"
-      """.stripMargin).withFallback(ConfigFactory.load()))
-    implicit val actorMaterializer = ActorMaterializer()
-    import actorSystem.dispatcher
-
-    val connect =
-      Http().outgoingConnection(
-        "localhost",
-        9977
-      )
-
-
-    val out =
-      StreamConverters.fromInputStream(() => System.in)
-        .map({
-          bs =>
-            HttpRequest(
-              uri = s"/starfelix/console/${id}/client2server",
-              entity = HttpEntity(bs)
-            )
-        })
-        .viaMat(connect)(Keep.right)
-        .to(Sink.ignore)
-        .run()
-
-    debug(out)
-
-    val poll =
-      HttpRequest(
-        uri = s"/starfelix/console/${id}/server2client"
-      )
-
-
-    val in =
-      Flow[HttpResponse]
-        .alsoTo(
-          Flow[HttpResponse]
-          .flatMapConcat(_.entity.dataBytes)
-          .to(StreamConverters.fromOutputStream(() => System.out))
-        )
-        .takeWhile({ resp =>
-          resp.status.isSuccess()
-        })
-        .map(_ => poll)
-        .prepend(Source.single(poll))
-
-    debug(connect.join(in).run())
+    FelixClient6.run()
 
   }
+
 
 }
