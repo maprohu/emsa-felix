@@ -25,8 +25,10 @@ object RunMaven {
         "felix-bundle",
         "1.0.0.dev"
       ),
-      "http://localhost:9977/starfelix/repo",
-      "file:/wl_domains/star/star-apps/data/starfelix/repo"
+      "http://twls55:7030/npr-filter-tais-npr/repo",
+//      "http://localhost:9977/starfelix/repo",
+      "file:/wl_domains/imdate/imdate-ext/data/starfelix/repo"
+//    "file:/wl_domains/star/star-apps/data/starfelix/repo"
     ).onComplete{ res =>
       println(res)
       Http().shutdownAllConnectionPools().onComplete { _ =>

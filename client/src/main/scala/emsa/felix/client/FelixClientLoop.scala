@@ -54,7 +54,7 @@ object FelixClientLoop {
     StreamConverters.fromInputStream(() => System.in)
       .via(
         Framing.delimiter(
-          ByteString(System.lineSeparator().getBytes),
+          ByteString("\n".getBytes),
           maximumFrameLength = 100,
           allowTruncation = true
         ))
